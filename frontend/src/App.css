@@ -1,0 +1,264 @@
+:root {
+  color: #e6f1ff;
+  font-family: "Segoe UI", "Inter", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(63, 88, 143, 0.35), transparent 45%),
+    radial-gradient(circle at 80% 10%, rgba(170, 66, 196, 0.2), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(25, 167, 206, 0.18), transparent 45%),
+    #050813;
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 2.6vw, 2.5rem);
+}
+
+.app-header p {
+  margin: 0.55rem 0 0;
+  color: #b8c7dc;
+}
+
+.state-banner {
+  margin-top: 1rem;
+  padding: 0.9rem;
+  border-radius: 10px;
+  background: rgba(90, 120, 185, 0.2);
+  border: 1px solid rgba(144, 184, 255, 0.35);
+}
+
+.state-banner.loading {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.state-banner.error {
+  background: rgba(255, 96, 96, 0.14);
+  border-color: rgba(255, 96, 96, 0.4);
+}
+
+.state-banner.warning {
+  background: rgba(255, 193, 7, 0.12);
+  border-color: rgba(255, 193, 7, 0.45);
+  color: #ffe39d;
+}
+
+.layout-grid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 320px 1fr;
+  align-items: start;
+}
+
+.card {
+  border-radius: 14px;
+  border: 1px solid rgba(124, 154, 202, 0.35);
+  background: rgba(10, 16, 31, 0.8);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 0.85rem;
+}
+
+.panel {
+  grid-row: span 2;
+}
+
+.search-box,
+select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #35507d;
+  background: #0f1b34;
+  color: #ecf3ff;
+}
+
+.search-box {
+  margin-bottom: 0.55rem;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #bcd0e8;
+  font-size: 0.88rem;
+}
+
+.sync-btn {
+  width: 100%;
+  margin-top: 0.55rem;
+  margin-bottom: 0.6rem;
+  padding: 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #4e7fd0;
+  background: linear-gradient(90deg, #163c75 0%, #2e5fa3 100%);
+  color: #ecf4ff;
+  cursor: pointer;
+}
+
+.sync-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.sync-note {
+  margin-bottom: 0.7rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(42, 71, 120, 0.4);
+  border: 1px solid #38527d;
+  color: #d8e7ff;
+  font-size: 0.88rem;
+}
+
+.range-note {
+  margin-bottom: 0.7rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(40, 58, 98, 0.42);
+  border: 1px solid #40598a;
+  color: #d5e4ff;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.clear-btn {
+  width: 100%;
+  margin-top: 0.2rem;
+  margin-bottom: 0.85rem;
+  padding: 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #37598f;
+  background: #162544;
+  color: #e6f1ff;
+  cursor: pointer;
+}
+
+.quick-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.quick-stats div {
+  background: rgba(31, 49, 83, 0.55);
+  border: 1px solid #2f4771;
+  border-radius: 8px;
+  padding: 0.55rem;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.quick-stats small {
+  color: #afc2de;
+}
+
+.event-list {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.event-btn {
+  text-align: left;
+  width: 100%;
+  border: 1px solid #2a3d61;
+  border-radius: 10px;
+  background: #101a30;
+  color: #e9f4ff;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.event-btn span {
+  color: #afc2de;
+  font-size: 0.88rem;
+}
+
+.event-btn:hover,
+.event-btn.active {
+  border-color: #66b4ff;
+  transform: translateY(-1px);
+}
+
+.globe-wrap {
+  min-height: 480px;
+}
+
+.globe-box {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid #253d66;
+}
+
+.info-panel p {
+  margin: 0.45rem 0;
+}
+
+.info-panel label {
+  display: block;
+  margin-top: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.compare-summary {
+  margin-top: 0.75rem;
+  border: 1px solid #2a446c;
+  background: rgba(23, 38, 66, 0.5);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+}
+
+.chart-wrap {
+  grid-column: 1 / -1;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+
+@media (max-width: 1100px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    grid-row: auto;
+  }
+
+  .globe-wrap {
+    min-height: 420px;
+  }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Meteor Alpha",
+    "observed_at": "2026-03-14T19:00:00Z",
+    "station": "Hyderabad Station A",
+    "lat_start": 22.0,
+    "lon_start": 70.0,
+    "lat_end": 30.0,
+    "lon_end": 80.0,
+    "velocity_km_s": [17.0, 16.2, 14.8, 12.9],
+    "trajectory_points": [
+      { "lat": 22.0, "lon": 70.0, "alt_km": 88 },
+      { "lat": 24.0, "lon": 72.5, "alt_km": 75 },
+      { "lat": 26.0, "lon": 75.0, "alt_km": 62 },
+      { "lat": 28.0, "lon": 77.8, "alt_km": 48 },
+      { "lat": 30.0, "lon": 80.0, "alt_km": 35 }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Meteor Beta",
+    "observed_at": "2026-03-14T20:10:00Z",
+    "station": "Varanasi Station B",
+    "lat_start": 10.0,
+    "lon_start": 60.0,
+    "lat_end": 20.0,
+    "lon_end": 75.0,
+    "velocity_km_s": [21.3, 20.1, 18.4, 15.2],
+    "trajectory_points": [
+      { "lat": 10.0, "lon": 60.0, "alt_km": 92 },
+      { "lat": 12.0, "lon": 63.0, "alt_km": 78 },
+      { "lat": 14.0, "lon": 66.0, "alt_km": 66 },
+      { "lat": 17.0, "lon": 70.5, "alt_km": 52 },
+      { "lat": 20.0, "lon": 75.0, "alt_km": 39 }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Meteor Gamma",
+    "observed_at": "2026-03-14T21:05:00Z",
+    "station": "Pune Station C",
+    "lat_start": 16.2,
+    "lon_start": 73.4,
+    "lat_end": 29.1,
+    "lon_end": 84.0,
+    "velocity_km_s": [19.7, 18.5, 17.4, 15.1],
+    "trajectory_points": [
+      { "lat": 16.2, "lon": 73.4, "alt_km": 90 },
+      { "lat": 19.0, "lon": 75.8, "alt_km": 80 },
+      { "lat": 22.5, "lon": 78.2, "alt_km": 67 },
+      { "lat": 25.8, "lon": 81.0, "alt_km": 53 },
+      { "lat": 29.1, "lon": 84.0, "alt_km": 40 }
+    ]
+  }
+]
