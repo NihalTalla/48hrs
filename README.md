@@ -6,6 +6,26 @@ This starter gives you a working end-to-end demo:
 - React frontend with event catalogue
 - 3D globe trajectory visualization
 - Velocity comparison chart
+- Scientific source registry + architecture stack endpoints
+
+## Scientific Data Sources
+
+- Global Meteor Network - Primary meteor observation dataset
+- NASA Fireball API - Fireball event catalogue (integrated in current MVP)
+- American Meteor Society - Real-time meteor reports
+- IAU Meteor Data Centre - Meteor shower classification
+- JPL Horizons API - Planetary positions and orbit calculations
+- SonotaCo Meteor Orbit Database - Reference meteor orbit dataset
+- EDMOND Database - European multi-station meteor observations
+- NASA Meteoroid Environment Office Dataset - Meteoroid environment modelling
+
+## Technology Stack
+
+- Frontend: React / Next.js, Tailwind CSS, CesiumJS, Three.js, Plotly.js
+- Backend: Python, FastAPI, NumPy, SciPy, Pandas
+- Astronomy libraries: Astropy, Skyfield
+- Database & cache: PostgreSQL, Redis (optional)
+- Deployment: Vercel (frontend), Render or Railway (backend), Supabase or Neon (database), GitHub (version control)
 
 ## Project Structure
 
@@ -38,6 +58,8 @@ API endpoints:
 
 - `GET /`
 - `GET /health`
+- `GET /sources`
+- `GET /stack`
 - `GET /data-status`
 - `GET /dataset-range?source=auto`
 - `POST /sync-real-events?limit=2000`

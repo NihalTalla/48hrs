@@ -5,6 +5,77 @@ import Plot from "react-plotly.js";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 const INITIAL_FILTERS = { q: "", dateFrom: "", dateTo: "", station: "" };
+const FALLBACK_SOURCES = [
+  {
+    id: "global-meteor-network",
+    name: "Global Meteor Network",
+    category: "Observation",
+    role: "Primary meteor observation dataset",
+    integration_status: "planned",
+  },
+  {
+    id: "nasa-fireball-api",
+    name: "NASA Fireball API",
+    category: "Event Catalogue",
+    role: "Fireball event catalogue",
+    integration_status: "live",
+  },
+  {
+    id: "american-meteor-society",
+    name: "American Meteor Society",
+    category: "Reports",
+    role: "Real-time meteor reports",
+    integration_status: "planned",
+  },
+  {
+    id: "iau-meteor-data-centre",
+    name: "IAU Meteor Data Centre",
+    category: "Classification",
+    role: "Meteor shower classification",
+    integration_status: "planned",
+  },
+  {
+    id: "jpl-horizons-api",
+    name: "JPL Horizons API",
+    category: "Orbital Mechanics",
+    role: "Planetary positions and orbit calculations",
+    integration_status: "planned",
+  },
+  {
+    id: "sonotaco-meteor-orbit-db",
+    name: "SonotaCo Meteor Orbit Database",
+    category: "Reference Orbit Data",
+    role: "Reference meteor orbit dataset",
+    integration_status: "planned",
+  },
+  {
+    id: "edmond-database",
+    name: "EDMOND Database",
+    category: "Multi-station Observations",
+    role: "European multi-station meteor observations",
+    integration_status: "planned",
+  },
+  {
+    id: "nasa-meteoroid-environment-office",
+    name: "NASA Meteoroid Environment Office Dataset",
+    category: "Environment Modelling",
+    role: "Meteoroid environment modelling",
+    integration_status: "planned",
+  },
+];
+
+const FALLBACK_STACK = {
+  frontend: ["React / Next.js", "Tailwind CSS", "CesiumJS", "Three.js", "Plotly.js"],
+  backend: ["Python", "FastAPI", "NumPy", "SciPy", "Pandas"],
+  astronomy_scientific: ["Astropy", "Skyfield"],
+  database_storage: ["PostgreSQL", "Redis (optional cache)"],
+  deployment: {
+    frontend_hosting: "Vercel",
+    backend_hosting: "Render / Railway",
+    database_hosting: "Supabase / Neon",
+    version_control: "GitHub",
+  },
+};
 
 const normalizeEvents = (rawEvents) => {
   if (!Array.isArray(rawEvents)) return [];
@@ -68,7 +139,10 @@ function App() {
   const [compareLoading, setCompareLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [syncMessage, setSyncMessage] = useState("");
+  const [sources, setSources] = useState(FALLBACK_SOURCES);
+  const [stackProfile, setStackProfile] = useState(FALLBACK_STACK);
   const [error, setError] = useState("");
+  const [globeSize, setGlobeSize] = useState({ width: 760, height: 420 });
 
   const loadBundledRealData = async () => {
     const response = await fetch("/real_events.json");
@@ -77,6 +151,51 @@ function App() {
     }
     return normalizeEvents(await response.json());
   };
+
+  useEffect(() => {
+    const fetchProjectMetadata = async () => {
+      try {
+        const [sourceResponse, stackResponse] = await Promise.all([
+          axios.get(`${API_BASE}/sources`),
+          axios.get(`${API_BASE}/stack`),
+        ]);
+
+        const remoteSources = sourceResponse?.data?.sources;
+        if (Array.isArray(remoteSources) && remoteSources.length > 0) {
+          setSources(remoteSources);
+        }
+
+        const remoteStack = stackResponse?.data;
+        if (remoteStack && typeof remoteStack === "object") {
+          setStackProfile(remoteStack);
+        }
+      } catch (metadataError) {
+        setSources(FALLBACK_SOURCES);
+        setStackProfile(FALLBACK_STACK);
+      }
+    };
+
+    fetchProjectMetadata();
+  }, []);
+
+  useEffect(() => {
+    const updateGlobeSize = () => {
+      const viewportWidth = window.innerWidth;
+      if (viewportWidth < 700) {
+        setGlobeSize({ width: Math.max(viewportWidth - 52, 300), height: 290 });
+        return;
+      }
+      if (viewportWidth < 1100) {
+        setGlobeSize({ width: Math.max(viewportWidth - 90, 420), height: 360 });
+        return;
+      }
+      setGlobeSize({ width: 760, height: 420 });
+    };
+
+    updateGlobeSize();
+    window.addEventListener("resize", updateGlobeSize);
+    return () => window.removeEventListener("resize", updateGlobeSize);
+  }, []);
 
   useEffect(() => {
     const fetchDatasetRange = async () => {
@@ -292,6 +411,15 @@ function App() {
     return { total, peak };
   }, [events]);
 
+  const sourceStats = useMemo(() => {
+    const integrated = sources.filter((source) => source.integration_status === "live").length;
+    return {
+      total: sources.length,
+      integrated,
+      planned: Math.max(sources.length - integrated, 0),
+    };
+  }, [sources]);
+
   const updateFilter = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
@@ -450,8 +578,8 @@ function App() {
                 pointAltitude={(d) => d.alt_km / 300}
                 pointRadius={0.22}
                 pointColor={() => "#ffe66d"}
-                width={760}
-                height={420}
+                width={globeSize.width}
+                height={globeSize.height}
               />
             </div>
           </section>
@@ -530,6 +658,94 @@ function App() {
               style={{ width: "100%", height: "320px" }}
               useResizeHandler
             />
+          </section>
+
+          <section className="card source-wrap">
+            <h2>Scientific Dataset Registry</h2>
+            <div className="quick-stats source-stats">
+              <div>
+                <small>Total Sources</small>
+                <strong>{sourceStats.total}</strong>
+              </div>
+              <div>
+                <small>Integrated</small>
+                <strong>{sourceStats.integrated}</strong>
+              </div>
+              <div>
+                <small>Planned</small>
+                <strong>{sourceStats.planned}</strong>
+              </div>
+            </div>
+            <div className="source-list">
+              {sources.map((source) => (
+                <article key={source.id} className="source-item">
+                  <div className="source-top">
+                    <strong>{source.name}</strong>
+                    <span
+                      className={`source-status ${
+                        source.integration_status === "live" ? "live" : "planned"
+                      }`}
+                    >
+                      {source.integration_status === "live" ? "Live" : "Planned"}
+                    </span>
+                  </div>
+                  <p>{source.role}</p>
+                  <small>{source.category}</small>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="card stack-wrap">
+            <h2>Technology Stack</h2>
+            <div className="stack-grid">
+              <div>
+                <h3>Frontend</h3>
+                <ul>
+                  {(stackProfile.frontend || []).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3>Backend</h3>
+                <ul>
+                  {(stackProfile.backend || []).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3>Astronomy Libraries</h3>
+                <ul>
+                  {(stackProfile.astronomy_scientific || []).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3>Data Layer</h3>
+                <ul>
+                  {(stackProfile.database_storage || []).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="deploy-note">
+              <p>
+                <b>Frontend Hosting:</b> {stackProfile.deployment?.frontend_hosting || "Vercel"}
+              </p>
+              <p>
+                <b>Backend Hosting:</b> {stackProfile.deployment?.backend_hosting || "Render / Railway"}
+              </p>
+              <p>
+                <b>Database Hosting:</b> {stackProfile.deployment?.database_hosting || "Supabase / Neon"}
+              </p>
+              <p>
+                <b>Version Control:</b> {stackProfile.deployment?.version_control || "GitHub"}
+              </p>
+            </div>
           </section>
         </section>
       )}

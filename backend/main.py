@@ -16,6 +16,104 @@ MOCK_DATA_FILE = BASE_DIR.parent / "dataset" / "events.json"
 REAL_DATA_FILE = BASE_DIR.parent / "dataset" / "real_events.json"
 CNEOS_API_URL = "https://ssd-api.jpl.nasa.gov/fireball.api"
 
+SCIENTIFIC_SOURCES: list[dict[str, Any]] = [
+    {
+        "id": "global-meteor-network",
+        "name": "Global Meteor Network",
+        "category": "Observation",
+        "role": "Primary meteor observation dataset",
+        "integration_status": "planned",
+        "access": "Community network exports/API",
+    },
+    {
+        "id": "nasa-fireball-api",
+        "name": "NASA Fireball API",
+        "category": "Event Catalogue",
+        "role": "Fireball event catalogue",
+        "integration_status": "live",
+        "access": CNEOS_API_URL,
+    },
+    {
+        "id": "american-meteor-society",
+        "name": "American Meteor Society",
+        "category": "Reports",
+        "role": "Real-time meteor reports",
+        "integration_status": "planned",
+        "access": "AMS fireball reports feed/API",
+    },
+    {
+        "id": "iau-meteor-data-centre",
+        "name": "IAU Meteor Data Centre",
+        "category": "Classification",
+        "role": "Meteor shower classification",
+        "integration_status": "planned",
+        "access": "IAU MDC datasets",
+    },
+    {
+        "id": "jpl-horizons-api",
+        "name": "JPL Horizons API",
+        "category": "Orbital Mechanics",
+        "role": "Planetary positions and orbit calculations",
+        "integration_status": "planned",
+        "access": "JPL Horizons API",
+    },
+    {
+        "id": "sonotaco-meteor-orbit-db",
+        "name": "SonotaCo Meteor Orbit Database",
+        "category": "Reference Orbit Data",
+        "role": "Reference meteor orbit dataset",
+        "integration_status": "planned",
+        "access": "SonotaCo dataset releases",
+    },
+    {
+        "id": "edmond-database",
+        "name": "EDMOND Database",
+        "category": "Multi-station Observations",
+        "role": "European multi-station meteor observations",
+        "integration_status": "planned",
+        "access": "EDMOND data publications",
+    },
+    {
+        "id": "nasa-meteoroid-environment-office",
+        "name": "NASA Meteoroid Environment Office Dataset",
+        "category": "Environment Modelling",
+        "role": "Meteoroid environment modelling",
+        "integration_status": "planned",
+        "access": "NASA MEO public resources",
+    },
+]
+
+STACK_PROFILE: dict[str, Any] = {
+    "frontend": [
+        "React / Next.js",
+        "Tailwind CSS",
+        "CesiumJS",
+        "Three.js",
+        "Plotly.js",
+    ],
+    "backend": [
+        "Python",
+        "FastAPI",
+        "NumPy",
+        "SciPy",
+        "Pandas",
+    ],
+    "astronomy_scientific": [
+        "Astropy",
+        "Skyfield",
+    ],
+    "database_storage": [
+        "PostgreSQL",
+        "Redis (optional cache)",
+    ],
+    "deployment": {
+        "frontend_hosting": "Vercel",
+        "backend_hosting": "Render / Railway",
+        "database_hosting": "Supabase / Neon",
+        "version_control": "GitHub",
+    },
+}
+
 
 class DataSourceError(RuntimeError):
     """Raised when a dataset cannot be loaded or fetched."""
@@ -271,7 +369,7 @@ def dataset_summary(source: Literal["auto", "mock", "real"]) -> dict[str, Any]:
     }
 
 
-app = FastAPI(title="Meteor MVP API", version="0.2.0")
+app = FastAPI(title="Meteor MVP API", version="0.3.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -289,6 +387,22 @@ def home() -> dict[str, str]:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/sources")
+def get_sources() -> dict[str, Any]:
+    integrated = sum(1 for source in SCIENTIFIC_SOURCES if source["integration_status"] == "live")
+    return {
+        "total_sources": len(SCIENTIFIC_SOURCES),
+        "integrated_sources": integrated,
+        "planned_sources": len(SCIENTIFIC_SOURCES) - integrated,
+        "sources": SCIENTIFIC_SOURCES,
+    }
+
+
+@app.get("/stack")
+def get_stack() -> dict[str, Any]:
+    return STACK_PROFILE
 
 
 @app.get("/data-status")
