@@ -1,31 +1,21 @@
-# Meteor MVP Starter (24-Hour Hackathon Build)
+# Meteor Platform (Astrathon Multi-Source Build)
 
-This starter gives you a working end-to-end demo:
+This build runs the ORION Astrathon meteor platform with live multi-source ingestion and backend-first computation.
 
-- FastAPI backend with fake-but-consistent meteor data
-- React frontend with event catalogue
-- 3D globe trajectory visualization
-- Velocity comparison chart
-- Scientific source registry + architecture stack endpoints
+## Integrated Datasets
 
-## Scientific Data Sources
-
-- Global Meteor Network - Primary meteor observation dataset
-- NASA Fireball API - Fireball event catalogue (integrated in current MVP)
-- American Meteor Society - Real-time meteor reports
-- IAU Meteor Data Centre - Meteor shower classification
-- JPL Horizons API - Planetary positions and orbit calculations
-- SonotaCo Meteor Orbit Database - Reference meteor orbit dataset
-- EDMOND Database - European multi-station meteor observations
-- NASA Meteoroid Environment Office Dataset - Meteoroid environment modelling
+- Global Meteor Network (GMN) daily trajectory summary
+- NASA/JPL Fireball API (CNEOS)
+- American Meteor Society (AMS) event listings
+- FRIPON data-release pipeline feed
+- IAU Meteor Data Centre stream list (for shower association)
 
 ## Technology Stack
 
-- Frontend: React / Next.js, Tailwind CSS, CesiumJS, Three.js, Plotly.js
-- Backend: Python, FastAPI, NumPy, SciPy, Pandas
+- Frontend: React, Tailwind CSS, Globe + Plotly visualisation
+- Backend: FastAPI, NumPy, SciPy, Pandas
 - Astronomy libraries: Astropy, Skyfield
-- Database & cache: PostgreSQL, Redis (optional)
-- Deployment: Vercel (frontend), Render or Railway (backend), Supabase or Neon (database), GitHub (version control)
+- Storage: SQLite/PostgreSQL via SQLAlchemy, optional Redis cache
 
 ## Project Structure
 
@@ -35,7 +25,13 @@ meteor-project
 |   |-- main.py
 |   `-- requirements.txt
 |-- dataset
-|   `-- events.json
+|   |-- real_events.json          (NASA snapshot)
+|   |-- gmn_events.json
+|   |-- ams_events.json
+|   |-- fripon_events.json
+|   |-- iau_showers.json
+|   |-- meteor.db
+|   `-- subscribers.json
 `-- frontend
     |-- src
     |   |-- App.jsx
@@ -54,45 +50,36 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-Optional environment variables:
+Optional env vars:
 
-- `DATABASE_URL` (defaults to local SQLite at `dataset/meteor.db`; use PostgreSQL URL in cloud)
-- `REDIS_URL` (optional Redis cache backend)
-- `CACHE_TTL_SECONDS` (default `120`)
+- `DATABASE_URL`
+- `REDIS_URL`
+- `CACHE_TTL_SECONDS`
+- SMTP vars for notifications (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_SENDER`)
 
-API endpoints:
+Key API endpoints:
 
-- `GET /`
 - `GET /health`
 - `GET /sources`
-- `GET /stack`
 - `GET /project-status`
 - `GET /data-status`
-- `GET /dataset-range?source=real`
-- `POST /sync-real-events?limit=20000`
-- `GET /events?source=real&q=fireball&date_from=2024-01-01&date_to=2026-12-31&station=nasa`
-- `GET /events/{event_id}`
-- `GET /trajectory/{event_id}`
-- `GET /compare?left=1&right=2`
+- `GET /dataset-range?source=nasa|gmn|ams|fripon`
+- `POST /sync-source/{source}?limit=...` where source is `nasa|gmn|ams|fripon|iau`
+- `POST /sync-required-datasets?limit_per_event_source=...`
+- `POST /sync-real-events?limit=...` (legacy alias for NASA sync)
+- `GET /events?source=nasa|gmn|ams|fripon`
+- `GET /process_meteor/{event_id}?source=...`
+- `GET /fetch_orbit/{event_id}?source=...`
+- `GET /compare_events?left=...&right=...&source=...`
+- Notifications endpoints under `/notifications/*`
 
-To load real data the first time:
+First-time data load:
 
-1. Start backend (`uvicorn main:app --reload`)
+1. Start backend
 2. Open `http://127.0.0.1:8000/docs`
-3. Run `POST /sync-real-events`
-
-After sync, the frontend runs in `Real NASA Data (Live Only)` mode.
-No mock/dummy fallback is used for event rendering.
-
-UI behavior:
-
-- Auto-detects date range from real dataset source
-- Defaults `Date To` to latest available dataset date
-- Warns when selected dates are outside available range
+3. Run `POST /sync-required-datasets`
 
 ## 2) Run Frontend
-
-Open a new terminal:
 
 ```bash
 cd frontend
@@ -101,28 +88,23 @@ npm.cmd install
 npm.cmd run dev
 ```
 
-Open the URL shown by Vite (usually `http://127.0.0.1:5173`).
+Frontend supports source selection (`NASA`, `GMN`, `AMS`, `FRIPON`) plus:
 
-## 3) What to Demo to Judges
+- `Sync Selected Source`
+- `Sync Required Datasets`
+- source-specific date-range validation and filtering
 
-1. Open event catalogue and pick a meteor event
-2. Show 3D trajectory arc on globe
-3. Show velocity profile chart
-4. Switch compare event and show second curve
+## 3) Demo Flow
 
-## 4) Fast Polishing Ideas
+1. Sync required datasets from UI or API
+2. Select a source and open event catalogue
+3. Visualize trajectory on globe and velocity profile
+4. Run `/process_meteor` and inspect residual diagnostics + shower match
+5. Run `/fetch_orbit` and inspect heliocentric elements
+6. Compare two events and dispatch notification demo
 
-- Add one "reconstructed by multi-station model" badge in UI
-- Add loading spinner for event fetch
-- Add one screenshot slide for architecture + one for results
-- Record a 60-second backup demo video
+## 4) Deploy Notes
 
-## 5) Quick Cloud Deploy (Optional)
-
-- Backend (Render):
-  - Use `render.yaml` from project root
-  - API URL will look like `https://meteor-mvp-api.onrender.com`
-- Frontend (Vercel):
-  - Import `frontend` folder as project root
-  - Add env var `VITE_API_URL=<your-render-url>`
-  - `vercel.json` is already included for SPA routing
+- Frontend: Vercel (`VITE_API_URL` must point to backend URL)
+- Backend: Render/Railway
+- Database: Supabase/Neon PostgreSQL URL in `DATABASE_URL`
